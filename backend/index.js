@@ -5,6 +5,7 @@ const cors = require('cors');
 const multer = require('multer');
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
+const morgan = require('morgan');
 
 const Job = require('./models/Job');
 const Resume = require('./models/Resume');
@@ -15,12 +16,15 @@ const app = express();
 const upload = multer({ dest: 'uploads/' });
 
 // ✅ MIDDLEWARE ORDER MATTERS
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(express.json()); // Must be before any routes
 app.use(express.urlencoded({ extended: true }));
-
+app.use(morgan('dev'));
 // ✅ Connect MongoDB
-mongoose.connect(process.env.LOCAL_DB_URI);
+mongoose.connect(process.env.MONGODB_URI);
 const db = mongoose.connection;
 db.on('error', () => console.error('Error connecting to database'));
 db.once('open', () => console.log('Connected to database'));
@@ -180,6 +184,6 @@ app.use((err, req, res, next) => {
 });
 
 // ✅ Start server
-app.listen(3001, () => {
-    console.log('Server is running at http://localhost:3001');
+app.listen(3000, () => {
+    console.log('Server is running at http://localhost:3000');
 });
