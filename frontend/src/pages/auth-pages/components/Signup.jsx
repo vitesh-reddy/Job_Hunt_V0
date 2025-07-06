@@ -5,24 +5,32 @@ import TextInput from './TextInput';
 import AuthLayout from '../index';
 import AuthHeader from './AuthHeader';
 import authApi from '@services/authApi';
+import { customToast } from '@utils/toast';
 
+// Handles user signup
 const Signup = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState('email');
+  const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
+    setIsLoading(true);
     try {
+      customToast.loading("Signing up...");
       await authApi.register({
         name: data.name,
         identifier: data.identifier,
         password: data.password,
+        remember: data.remember,
       });
+      customToast.endLoadAndSuccess("Validate OTP to finish Signup");
       navigate('/verify-otp');
     } catch (error) {
       console.error('Signup error:', error);
-      alert(error);
+      customToast.endLoadAndError(error);
     }
+    setIsLoading(false);
   };
 
   const switchMode = () => setMode((prev) => (prev === 'email' ? 'phone' : 'email'));
@@ -71,16 +79,16 @@ const Signup = () => {
                 <span className="text-[#7C7C7C]">Remember Me</span>
               </label>
             </div>
+            <button
+              disabled={isLoading}
+              type="submit"
+              className="w-full rounded-md bg-[#181C1E] py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+            >
+              Register
+            </button>
           </form>
         </div>
         <div className="space-y-4 pt-6">
-          <button
-            type="submit"
-            onClick={handleSubmit(onSubmit)}
-            className="w-full rounded-md bg-[#181C1E] py-3 text-sm font-semibold text-white transition hover:brightness-110"
-          >
-            Register
-          </button>
           <button
             type="button"
             onClick={switchMode}

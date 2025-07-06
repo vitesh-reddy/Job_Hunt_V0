@@ -6,10 +6,16 @@ const multer = require('multer');
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const morgan = require('morgan');
+const logger = require('./config/logger');
+const connectDB = require('./config/db');
+const loggerMiddleware = require('./middlewares/loggerMiddleware');
+const fs = require('fs');
+const cookieParser = require('cookie-parser')
 
 const Job = require('./models/Job');
 const Resume = require('./models/Resume');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const resumeRoutes = require('./routes/resumeRoutes')
 
 const app = express();
@@ -20,17 +26,25 @@ app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true,
 }));
-app.use(express.json()); // Must be before any routes
+app.use(cookieParser());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
-// ✅ Connect MongoDB
-mongoose.connect(process.env.MONGODB_URI);
-const db = mongoose.connection;
-db.on('error', () => console.error('Error connecting to database'));
-db.once('open', () => console.log('Connected to database'));
+
+
+// Create logs folder if it doesn't exist
+if (!fs.existsSync('logs'))
+  fs.mkdirSync('logs'); 
+
+const stream = {
+  write: (message) => logger.info(message.trim()) // send HTTP logs to Winston
+};
+
+const morganFormat = ':method :url :status :res[content-length] - :response-time ms';
+app.use(morgan(morganFormat, { stream }));
 
 // ✅ Mount routes with a base path (recommended)
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 
 // ✅ Scraper site configs
 const options = [
@@ -183,7 +197,12 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
 });
 
-// ✅ Start server
-app.listen(3000, () => {
-    console.log('Server is running at http://localhost:3000');
+app.use(loggerMiddleware);
+
+const PORT = process.env.PORT;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/jobhunt';
+connectDB(MONGODB_URI).then(() => {
+  app.listen(PORT, () => {
+    logger.info(`Server running at http://localhost:${PORT}`);
+  });
 });

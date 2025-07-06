@@ -4,19 +4,32 @@ import TextInput from './TextInput';
 import AuthLayout from '../index';
 import AuthHeader from './AuthHeader';
 import authApi from '@services/authApi';
+import { useState } from 'react';
+import { customToast } from '@utils/toast';
 
+// Handles user login
 const Login = () => {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data, e) => {
+    e.preventDefault();
+    setIsLoading(true);
     try {
-      await authApi.login(data);
+      customToast.loading("Logging...");
+      await authApi.login({
+        identifier: data.identifier,
+        password: data.password,
+        remember: data.remember,
+      });
+      customToast.endLoadAndSuccess("Login Successful");
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
-      alert(error);
+      customToast.endLoadAndError(error);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -27,7 +40,7 @@ const Login = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <TextInput
               label="Email / Mobile Number"
-              {...register('identifier', { 
+              {...register('identifier', {
                 required: 'Required',
                 pattern: {
                   value: /(^\S+@\S+\.\S+$)|(^\d{10}$)/,
@@ -51,16 +64,16 @@ const Login = () => {
                 Forgot Password?
               </Link>
             </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full rounded-md bg-[#181C1E] py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+            >
+              Login
+            </button>
           </form>
         </div>
         <div className="space-y-4 pt-6">
-          <button
-            type="submit"
-            onClick={handleSubmit(onSubmit)}
-            className="w-full rounded-md bg-[#181C1E] py-3 text-sm font-semibold text-white transition hover:brightness-110"
-          >
-            Login
-          </button>
           <p className="text-center text-xs text-[#7C7C7C]">
             Don’t have an account?{' '}
             <button

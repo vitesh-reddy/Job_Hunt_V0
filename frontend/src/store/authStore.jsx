@@ -1,22 +1,10 @@
-// src/store/authStore.jsx
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from "zustand";
 
-const useAuthStore = create(
-  persist(
-    (set) => ({
-      user: null,
-      isAuthenticated: false,
-      login: (userData) =>
-        set({ user: userData, isAuthenticated: true }),
-      logout: () =>
-        set({ user: null, isAuthenticated: false }),
-    }),
-    {
-      name: 'auth-storage', // localStorage key
-      partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
-    }
-  )
-)
+// Manages authentication state
+const useAuthStore = create((set) => ({
+  isAuthenticated: false,
+  login: () => set({ isAuthenticated: true }),
+  logout: () => set({ isAuthenticated: false }),
+}));
 
-export default useAuthStore
+export default useAuthStore;

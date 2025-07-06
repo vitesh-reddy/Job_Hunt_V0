@@ -7,19 +7,19 @@ const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'strict',
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
+// Handles user registration
 const register = async (req, res) => {
   try {
-    const { name, identifier, password } = req.body;
+    const { name, identifier, password, remember } = req.body;
 
     if (!name || !identifier || !password) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
     const isEmail = /\S+@\S+\.\S+/.test(identifier);
-    const isPhone = /^\d{10}$/.test(identifier);  
+    const isPhone = /^\d{10}$/.test(identifier);
     if (!isEmail && !isPhone) {
       return res.status(400).json({ error: 'Invalid email or phone number' });
     }
@@ -27,24 +27,36 @@ const register = async (req, res) => {
     const identifierType = isEmail ? 'email' : 'phone';
 
     let user = await User.findOne({ identifier });
-    if (user) 
-      return res.status(400).json({ error: `${identifierType} Identifier already exists` });
 
-    console.log(req.body)
+    if (user) {
+      if (user.isVerified)
+        return res.status(400).json({ error: `${identifierType} already Registered, Try Login` });      
+      user.name = name;
+      user.password = password;
+      user.remember = remember;
+      user.identifierType = identifierType;
 
-    user = new User({ name, identifier, identifierType, password });
-    await user.save();    
+    } else
+      user = new User({ name, identifier, identifierType, password, remember });
 
+    // Generate and set OTP
     const otp = generateOTP();
     user.otp = otp;
-    user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    user.otpExpires = Date.now() + 10 * 60 * 1000;
+
     await user.save();
 
     await sendOTP(identifier, otp);
 
     return res.status(201).json({
-      user: { id: user._id, name: user.name, identifier: user.identifier, identifierType: user.identifierType },
-      message: `User registered, OTP sent to your ${identifierType}`,
+      user: {
+        _id: user._id,
+        name: user.name,
+        identifier: user.identifier,
+        identifierType: user.identifierType,
+        remember: user.remember,
+      },
+      message: `User Registered, OTP sent to your ${identifierType}`,
     });
   } catch (error) {
     console.error('Registration error:', error.message);
@@ -52,9 +64,11 @@ const register = async (req, res) => {
   }
 };
 
+
+// Handles user login
 const login = async (req, res) => {
   try {
-    const { identifier, password } = req.body;
+    const { identifier, password, remember } = req.body;
 
     if (!identifier || !password) {
       return res.status(400).json({ error: 'Identifier and password are required' });
@@ -69,11 +83,15 @@ const login = async (req, res) => {
       return res.status(403).json({ error: 'Please verify your account with OTP' });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.cookie('jwt', token, COOKIE_OPTIONS);
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const cookieOptions = {
+      ...COOKIE_OPTIONS,
+      maxAge: remember ? 7 * 24 * 60 * 60 * 1000 : undefined,
+    };
+    res.cookie('jwt', token, cookieOptions);
 
     return res.json({
-      user: { id: user._id, name: user.name, identifier: user.identifier, identifierType: user.identifierType },
+      user: { _id: user._id, name: user.name, identifier: user.identifier, identifierType: user.identifierType, remember: user.remember },
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -81,17 +99,7 @@ const login = async (req, res) => {
   }
 };
 
-const getCurrentUser = async (req, res) => {
-  try {
-    return res.json({
-      user: { id: req.user._id, name: req.user.name, identifier: req.user.identifier, identifierType: req.user.identifierType },
-    });
-  } catch (error) {
-    console.error('Get current user error:', error);
-    return res.status(500).json({ error: 'Server error' });
-  }
-};
-
+// Handles user logout
 const logout = async (req, res) => {
   try {
     res.clearCookie('jwt', COOKIE_OPTIONS);
@@ -102,28 +110,34 @@ const logout = async (req, res) => {
   }
 };
 
+// Handles OTP verification
 const verifyOtp = async (req, res) => {
   try {
-    const { otp } = req.body;
-    if (!otp) {
-      return res.status(400).json({ error: 'OTP is required' });
-    }
+    const { _id, otp } = req.body;
+    if (!_id || !otp) 
+      return res.status(400).json({ error: 'User _id and OTP are required' });
 
-    const user = await User.findOne({ otp, otpExpires: { $gt: Date.now() } });
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid or expired OTP' });
-    }
+    const user = await User.findById(_id);
+    if (!user)
+      return res.status(404).json({ error: 'User not found' });    
+    
+    if (user.otp !== otp || user.otpExpires < Date.now()) 
+      return res.status(400).json({ error: 'Invalid or expired OTP' });    
 
     user.isVerified = true;
     user.otp = undefined;
-    user.otpExpires = undefined;
+    user.otpExpires = undefined;    
     await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.cookie('jwt', token, COOKIE_OPTIONS);
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const cookieOptions = {
+      ...COOKIE_OPTIONS,
+      maxAge: user.remember ? 7 * 24 * 60 * 60 * 1000 : undefined,
+    };
+    res.cookie('jwt', token, cookieOptions);
 
     return res.json({
-      user: { id: user._id, name: user.name, identifier: user.identifier, identifierType: user.identifierType },
+      user: { _id: user._id, name: user.name, identifier: user.identifier, identifierType: user.identifierType, remember: user.remember },
       message: 'OTP verified successfully',
     });
   } catch (error) {
@@ -132,16 +146,16 @@ const verifyOtp = async (req, res) => {
   }
 };
 
+// Handles OTP resend
 const resendOtp = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
-    if (!user) {
+    const user = await User.findById(req.body._id);
+    if (!user) 
       return res.status(404).json({ error: 'User not found' });
-    }
 
     const otp = generateOTP();
     user.otp = otp;
-    user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    user.otpExpires = Date.now() + 10 * 60 * 1000;
     await user.save();
 
     await sendOTP(user.identifier, otp);
@@ -152,4 +166,4 @@ const resendOtp = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getCurrentUser, logout, verifyOtp, resendOtp };
+module.exports = { register, login, logout, verifyOtp, resendOtp };

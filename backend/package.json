@@ -14,6 +14,7 @@
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "cheerio": "^1.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.6.0",
     "express": "^4.21.2",
@@ -22,6 +23,7 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.1",
     "nodemon": "^3.1.9",
-    "puppeteer": "^24.9.0"
+    "puppeteer": "^24.9.0",
+    "winston": "^3.17.0"
   }
 }
