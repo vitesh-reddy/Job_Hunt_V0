@@ -72,7 +72,7 @@ const VerifyOtp = () => {
     try {
       customToast.loading("Resending OTP...");
       await authApi.resendOtp();
-      customToast.endLoadAndError("OTP resent successfully");      
+      customToast.endLoadAndSuccess("OTP resent successfully");      
     } catch (error) {
       console.error('Resend OTP error:', error);
       customToast.endLoadAndError(error);
@@ -82,23 +82,24 @@ const VerifyOtp = () => {
 
   return (
     <AuthLayout>
-      <main className="flex w-full max-w-md flex-col justify-between p-8">
+      <main className="flex w-full flex-col justify-between p-8">
         <div>
           <AuthHeader title="Please enter your OTP" />
-          <form className="flex items-center justify-between gap-2 mb-8" onSubmit={(e) => e.preventDefault()}>
+          <form className="flex items-center justify-between gap-2 xl:pr-7 mb-8" onSubmit={(e) => e.preventDefault()}>
             {otp.map((digit, index) => (
-              <input
-                key={index}
-                id={`otp-${index}`}
-                value={digit}
-                ref={(el) => (inputsRef.current[index] = el)}
-                onChange={(e) => handleChange(index, e.target.value)}
-                onPaste={index === 0 ? handlePaste : undefined}
-                className="h-12 w-12 rounded-md bg-[rgba(124,124,124,0.1)] text-center text-xl font-semibold focus:ring-2 focus:ring-[#A10091]"
-                maxLength={1}
-                inputMode="numeric"
-                type="text"
-              />
+          <input
+            key={index}
+            id={`otp-${index}`}
+            value={digit ? '*' : ''}
+            ref={(el) => (inputsRef.current[index] = el)}
+            onChange={(e) => handleChange(index, e.target.value)}
+            onPaste={index === 0 ? handlePaste : undefined}
+            className="h-12 xl:h-[63px] w-12 xl:w-[58px] rounded-[10px] bg-[#F4F4F4] pt-3 xl:pt-5 text-center text-3xl xl:text-[40px] text-[#262626] focus:ring-2 focus:ring-[#A10091]"
+            maxLength={1}
+            inputMode="numeric"
+            type="text"
+            pattern="\d*"
+          />
             ))}
           </form>
         </div>
@@ -107,15 +108,15 @@ const VerifyOtp = () => {
             disabled={isVerifying || isResending}
             type="submit"
             onClick={() => submit()}
-            className="w-full rounded-md bg-[#181C1E] py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+            className="flex self-stretch justify-center items-center w-full h-[48px] sm:h-[48px] xl:h-[60px] px-6 xl:px-[32px] py-[10px] rounded-[10px] bg-[#000] text-[15px] xl:text-[16px] text-[#F6F6F6] transition hover:brightness-110 disabled:opacity-50"
           >
             Submit
           </button>
-          <p className="text-center text-xs text-[#7C7C7C]">
+          <p className="text-center text-[12px] sm:text-[14px] xl:text-[16px] text-[#262626] leading-[20px]">
             Didn’t receive the OTP?{' '}
             <button
               type="button"
-              className="font-semibold text-[#A10091] hover:underline"
+              className="text-[#262626] font-extrabold underline"
               onClick={resend}
             >
               Resend OTP
