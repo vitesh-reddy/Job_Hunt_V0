@@ -1,12 +1,13 @@
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
-import TextInput from './TextInput';
 import AuthLayout from '../index';
 import AuthHeader from './AuthHeader';
 import authApi from '@services/authApi';
 import { useState } from 'react';
 import { customToast } from '@utils/toast';
 import { motion, AnimatePresence } from "framer-motion";
+import Input from '@components/Input';
+import { Typography } from "@components/Typography";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -38,8 +39,8 @@ const Login = () => {
         <div>
           <AuthHeader title="Welcome Back!" information="Log in to your account" />
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-1 lg:space-y-3 2xl:space-y-4">
-            <TextInput
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-[16px] 2xl:space-y-[24px]">
+            <Input
               // {...formAnimations}            
               label="Email / Mobile Number"
               {...register('identifier', {
@@ -52,7 +53,7 @@ const Login = () => {
               error={errors.identifier}
             />
 
-            <TextInput
+            <Input
               // {...formAnimations}            
               label="Password"
               type="password"
@@ -66,7 +67,7 @@ const Login = () => {
               error={errors.password}
             />
 
-            <div className="flex items-center justify-between text-xs sm:text-sm lg:mb-8 2xl:mb-8">
+            <div className="flex items-center justify-between text-xs sm:text-sm lg:mb-6 2xl:mb-8">
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="accent-[#A10091]" {...register('remember')} />
                 <span className="text-[#262626]">Remember Me</span>
@@ -76,13 +77,10 @@ const Login = () => {
               </Link>
             </div>
 
-            <button
-              disabled={isLoading}
-              type="submit"
-              className="flex self-stretch justify-center items-center w-full h-[48px] sm:h-[48px] 2xl:h-[64px] px-6 2xl:px-[32px] py-[10px] rounded-[10px] bg-[#000] text-[15px] 2xl:text-[16px] text-[#F6F6F6] transition hover:brightness-110 disabled:opacity-50"
-            >
-              Login
-            </button>
+            <button disabled={isLoading} type="submit"
+              className="w-full group hover:bg-[#1B1C1C] hover:text-white lg:px-[16px] lg:py-[8px] 2xl:px-[24px] 2xl:py-[14px] border-2 border-[#1B1C1C] rounded-[4px] transiton-colors duration-300 ease-out" >
+              <Typography variant="bodyL_500" align="center"> Login </Typography>
+            </button>          
           </form>
         </div>
 
