@@ -1,11 +1,14 @@
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import Login from './pages/auth-pages/components/Login';
-import Signup from './pages/auth-pages/components/Signup';
-import VerifyOtp from './pages/auth-pages/components/VerifyOtp';
+import Login from '@pages/auth-pages/components/Login';
+import Signup from '@pages/auth-pages/components/Signup';
+import VerifyOtp from '@pages/auth-pages/components/VerifyOtp';
 import { CustomToaster } from '@utils/toast';
 import useUserStore from '@store/userStore';
 import ProtectedRoute from '@components/ProtectedRoute';
 import PublicOnlyRoute from '@components/PublicOnlyRoute';
+import MyAccount from '@pages/my-account';
+import { Typography } from '@components/Typography';
+// import Dashboard from './pages/Dashboard';
 
 const App = () => {
   const { user } = useUserStore();
@@ -17,7 +20,8 @@ const App = () => {
 
       <Routes>
         {/* Anyone can access this page */}
-        <Route path="/" element={<div>This is Unprotected Route</div>} />
+        {/* <Route path='/abc' element={<Dashboard /> } /> */}
+        <Route path="/" element={<Typography className="text-amber-300" > This is Unprotected Route</Typography>} />
 
         {/* Auth pages - only show if user is NOT logged in */}
         <Route element={<PublicOnlyRoute />}>
@@ -31,11 +35,12 @@ const App = () => {
           <Route
             path="/dashboard"
             element={<div> <br/><br/><br/><br/> {user._id} {user.name} {user.identifier} <button onClick={() => navigate("/dashboard1")}>Next</button> </div>}
-          />
+          />          
           <Route
             path="/dashboard1"
             element={<div> <br/><br/><br/><br/> {user.name} {user.identifier} <button onClick={() => navigate("/dashboard")}>Back</button> </div>}
           />
+          <Route path='/account' element={<MyAccount/>} />
           {/* Add more private routes here */}
         </Route>
       </Routes>

@@ -5,7 +5,7 @@ const AuthLayout = ({ children }) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [mode, setMode] = useState('login');
-  const styleForText = "font-bold font-manrope lg:text-xl xl:text-3xl w-full xl:leading-[40px]"
+  const styleForText = "font-bold font-manrope lg:text-xl 2xl:text-3xl w-full 2xl:leading-[40px]"
 
   useEffect(() => {
     const queryMode = searchParams.get('mode');
@@ -27,7 +27,7 @@ const AuthLayout = ({ children }) => {
     <div className="flex flex-1 items-center justify-center lg:mx-[5vw]">{children}</div>
 
     <div
-      className="hidden relative min-w-[50vw] lg:h-[95vh] xl:h-[95vh] items-end justify-end lg:flex font-sans"
+      className="hidden relative min-w-[50vw] lg:h-[95vh] 2xl:h-[95vh] items-end justify-end lg:flex font-sans"
       style={{
         backgroundImage: `url('/assets/Auth_Page_Image.png')`,
         backgroundSize: "100% 100%",
