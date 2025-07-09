@@ -6,7 +6,9 @@ import AuthLayout from '../index';
 import AuthHeader from './AuthHeader';
 import authApi from '@services/authApi';
 import { customToast } from '@utils/toast';
+import Input from '@components/Input';
 import { motion, AnimatePresence } from "framer-motion";
+import { Typography } from "@components/Typography";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -45,15 +47,15 @@ const Signup = () => {
         <div>
           <AuthHeader title="Register" information="Enter your details" />
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-1 lg:space-y-3 2xl:space-y-4">
-            <TextInput
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-[16px] 2xl:space-y-[24px]">
+            <Input
               // {...formAnimations}            
               label="Name"
               {...register('name', { required: 'Required' })}
               error={errors.name}
             />
 
-            <TextInput
+            <Input
               // {...formAnimations}
               label={mode === 'email' ? 'Email' : 'Mobile Number'}
               type={mode === 'email' ? 'email' : 'tel'}
@@ -67,7 +69,7 @@ const Signup = () => {
               error={errors.identifier}
             />
 
-            <TextInput
+            <Input
               label="Password"
               type="password"
               // {...formAnimations}
@@ -83,7 +85,7 @@ const Signup = () => {
               error={errors.password}
             />        
             
-            <div className="flex items-center justify-between text-xs sm:text-sm mb-6">
+            <div className="flex items-center justify-between text-xs sm:text-sm lg:mb-6 mb-8">
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -94,13 +96,10 @@ const Signup = () => {
               </label>
             </div>
 
-            <button
-              disabled={isLoading}
-              type="submit"
-              className="flex self-stretch justify-center items-center w-full h-[48px] sm:h-[48px] 2xl:h-[64px] px-6 2xl:px-[32px] py-[10px] rounded-[10px] bg-[#000] text-[15px] 2xl:text-[16px] text-[#F6F6F6] transition hover:brightness-110 disabled:opacity-50"
-            >
-              Register
-            </button>
+            <button disabled={isLoading} type="submit"
+              className="w-full group hover:bg-[#1B1C1C] hover:text-white lg:px-[16px] lg:py-[8px] 2xl:px-[24px] 2xl:py-[14px] border-2 border-[#1B1C1C] rounded-[4px] transiton-colors duration-300 ease-out" >
+              <Typography variant="bodyL_500" align="center"> Register </Typography>
+            </button>  
           </form>
         </div>
 

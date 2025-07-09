@@ -4,6 +4,7 @@ import AuthHeader from './AuthHeader';
 import authApi from '@services/authApi';
 import { customToast } from '@utils/toast';
 import { useNavigate } from 'react-router-dom';
+import { Typography } from "@components/Typography";
 
 const VerifyOtp = () => {
   const [otp, setOtp] = useState(Array(6).fill(''));
@@ -104,14 +105,10 @@ const VerifyOtp = () => {
           </form>
         </div>
         <div className="space-y-4 pt-6">
-          <button
-            disabled={isVerifying || isResending}
-            type="submit"
-            onClick={() => submit()}
-            className="flex self-stretch justify-center items-center w-full h-[48px] sm:h-[48px] xl:h-[60px] px-6 xl:px-[32px] py-[10px] rounded-[10px] bg-[#000] text-[15px] xl:text-[16px] text-[#F6F6F6] transition hover:brightness-110 disabled:opacity-50"
-          >
-            Submit
-          </button>
+          <button disabled={isVerifying || isResending} type="submit" onClick={() => submit()}
+            className="w-full group hover:bg-[#1B1C1C] hover:text-white lg:px-[16px] lg:py-[8px] 2xl:px-[24px] 2xl:py-[14px] border-2 border-[#1B1C1C] rounded-[4px] transiton-colors duration-300 ease-out" >
+            <Typography variant="bodyL_500" align="center"> Submit </Typography>
+          </button>            
           <p className="text-center text-[12px] sm:text-[14px] xl:text-[16px] text-[#262626] leading-[20px]">
             Didn’t receive the OTP?{' '}
             <button

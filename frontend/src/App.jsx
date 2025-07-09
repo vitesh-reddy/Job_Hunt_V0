@@ -7,7 +7,7 @@ import useUserStore from '@store/userStore';
 import ProtectedRoute from '@components/ProtectedRoute';
 import PublicOnlyRoute from '@components/PublicOnlyRoute';
 import MyAccount from '@pages/my-account';
-import { Typography } from '@components/Typography';
+import Ztest from './Ztest';
 // import Dashboard from './pages/Dashboard';
 
 const App = () => {
@@ -21,7 +21,7 @@ const App = () => {
       <Routes>
         {/* Anyone can access this page */}
         {/* <Route path='/abc' element={<Dashboard /> } /> */}
-        <Route path="/" element={<Typography className="text-amber-300" > This is Unprotected Route</Typography>} />
+        <Route path="/" element={<Ztest/> } />
 
         {/* Auth pages - only show if user is NOT logged in */}
         <Route element={<PublicOnlyRoute />}>

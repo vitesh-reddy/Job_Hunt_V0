@@ -26,15 +26,7 @@ const AuthLayout = ({ children }) => {
   <div className="flex lg:justify-between min-h-screen mx-auto w-[70vw] lg:w-full items-center font-sans max-h-screen lg:p-6">
     <div className="flex flex-1 items-center justify-center lg:mx-[5vw]">{children}</div>
 
-    <div
-      className="hidden relative min-w-[50vw] lg:h-[95vh] 2xl:h-[95vh] items-end justify-end lg:flex font-sans"
-      style={{
-        backgroundImage: `url('/assets/Auth_Page_Image.png')`,
-        backgroundSize: "100% 100%",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "right center",
-      }}    
-    >
+    <div className="hidden relative min-w-[50vw] items-end justify-end lg:flex font-sans rounded-tl-[20px] rounded-tr-[20px] rounded-br-[20px] rounded-bl-[150px] bg-[linear-gradient(116deg,_#FFD8E7_10.88%,_#FF7AE5_89.12%)]">
       <div className="absolute top-3/4 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center w-[660px]">
       {mode === 'login' && (<p className={styleForText}>Sign in and continue your job hunt with ease.</p>)}
       {(mode === 'email' || mode === 'mobile number') && (
