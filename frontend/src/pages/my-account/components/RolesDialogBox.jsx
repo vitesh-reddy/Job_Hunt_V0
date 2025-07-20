@@ -1,9 +1,25 @@
-import React, { useState } from "react";
-import { X, Plus } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { Typography } from "@components/Typography";
+import Input from '@components/Input';
+import CancelButton from "./CancelButton";
+import SaveButton from "./SaveButton";
+import useUserStore from "@store/userStore";
+import userApi from "@services/userApi";
+import { customToast } from "@utils/toast";
 
-const RolesDialogBox = () => {
+const RolesDialogBox = ({ onClose }) => {
+  const { user } = useUserStore();
   const [roles, setRoles] = useState([]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load user roles into state
+  useEffect(() => {
+    if (user?.roles) {
+      setRoles(user.roles);
+    }
+  }, [user]);
 
   const addRole = (role) => {
     if (role && !roles.includes(role)) {
@@ -12,65 +28,80 @@ const RolesDialogBox = () => {
     setInput("");
   };
 
-  const removeRole = (role) => {
-    setRoles(roles.filter((s) => s !== role));
-  };
+  const removeRole = (role) => setRoles(roles.filter((s) => s !== role));
 
-  const handleInputKeyDown = (e) => { 
+  const handleInputKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       addRole(input.trim());
     }
   };
 
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (roles.length < 1) {
+      customToast.error("Please add at least 1 role");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      customToast.loading("Saving roles...");
+      const response = await userApi.updateRoles(roles);
+      customToast.endLoadAndSuccess("Roles updated successfully");
+      onClose();
+    } catch (error) {
+      console.error("Update roles error:", error);
+      customToast.endLoadAndError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancel = (e) => {
+    e.preventDefault();
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 min-h-screen z-50 flex items-center justify-center backdrop-blur-[2px] bg-black/10 px-4">
-    <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-xl">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800">Roles</h2>
+      <div className="fade-in fade-out bg-white space-y-4 2xl:space-y-10 p-10 rounded-[10px] shadow-md w-full max-w-[600px] 2xl:max-w-[800px] text-[#180323]">
+        <div className="flex justify-between items-start">
+          <Typography variant="h6_700" className="leading-[32px]">Job role</Typography>
+          <button onClick={handleCancel} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
+          </button>
         </div>
-        <button className="text-gray-400 hover:text-gray-600">
-          <X size={20} />
-        </button>
-      </div>
 
-      {/* Input Field */}
-      <input
-        type="text"
-        placeholder="Add roles"
-        className="w-full border border-gray-300 px-3 py-2 rounded-md mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#9D3BB0]"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleInputKeyDown}
-      />
-    
-      {/* Selected Roles */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {roles.map((role, index) => (
-          <span
-            key={index}
-            className="bg-[#9D3BB0] text-white px-3 py-1 rounded-md flex items-center gap-2 text-sm"
-          >
-            {role}
-            <button onClick={() => removeRole(role)}>
-              <X size={14} className="text-white" />
-            </button>
-          </span>
-        ))}
-      </div>
+        {/* Input Field */}
+        <Input
+          type="text"
+          label="Search job roles here"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleInputKeyDown}
+        />
 
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-4">
-        <button className="text-[#9D3BB0] hover:underline">Cancel</button>
-        <button
-          className="bg-[#9D3BB0] text-white px-5 py-2 rounded-md text-sm hover:bg-[#812d94]"
-          disabled={roles.length < 3}
-        >
-          Save
-        </button>
+        <div className="space-y-4">
+          {/* Selected Roles */}
+          <div className="flex flex-wrap gap-4">
+            {roles.map((role, index) => (
+              <Typography
+                key={`${index}_${role}`}
+                variant="bodyXS_700"
+                className="flex items-center gap-2 font-medium bg-[#993D6F] hover:bg-[#993D6FEE] text-white px-4 py-[7px] rounded-sm"
+              >
+                {role} <button className="cursor-pointer" onClick={() => removeRole(role)}><X size={18} /></button>
+              </Typography>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-4">
+          <CancelButton handleClose={handleCancel} disabled={isLoading} />
+          <SaveButton handleSave={handleSave} disabled={isLoading || roles.length < 1} />
+        </div>
       </div>
-    </div>
     </div>
   );
 };

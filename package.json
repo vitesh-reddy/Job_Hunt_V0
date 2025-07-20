@@ -2,10 +2,10 @@
   "name": "job_hunt",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "frontend" : "npm run dev --prefix frontend",
-    "backend" : "nodemon index.js --prefix backend"
+    "backend" : "nodemon server.js --prefix backend"
   },
   "repository": {
     "type": "git",

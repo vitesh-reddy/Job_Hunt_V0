@@ -1,33 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Plus } from "lucide-react";
+import { Typography } from "@components/Typography";
+import Input from '@components/Input';
+import CancelButton from "./CancelButton";
+import SaveButton from "./SaveButton";
+import useUserStore from "@store/userStore";
+import userApi from "@services/userApi";
+import { customToast } from "@utils/toast";
 
-const defaultSuggestions = [
-  "JavaScript",
-  "React",
-  "Node.js",
-  "Tailwind CSS",
-  "Python",
-  "Java",
-  "SQL",
-  "MongoDB",
-  "Express.js",
-  "TypeScript"
-];
+const defaultSuggestions = ["JavaScript", "React", "Node.js", "Tailwind CSS", "Python", "Java", "SQL", "MongoDB", "Express.js", "TypeScript"];
 
-const SkillsDialogBox = () => {
+const SkillsDialogBox = ({ onClose }) => {
+  const { user } = useUserStore();
   const [skills, setSkills] = useState([]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load user skills into state
+  useEffect(() => {
+    if (user?.skills) {
+      setSkills(user.skills);
+    }
+  }, [user]);
 
   const addSkill = (skill) => {
-    if (skill && !skills.includes(skill)) {
+    if (skill && !skills.includes(skill)) 
       setSkills([...skills, skill]);
-    }
+      
     setInput("");
   };
 
-  const removeSkill = (skill) => {
-    setSkills(skills.filter((s) => s !== skill));
-  };
+  const removeSkill = (skill) => setSkills(skills.filter((s) => s !== skill));
 
   const handleInputKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -36,75 +39,95 @@ const SkillsDialogBox = () => {
     }
   };
 
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (skills.length < 3) {
+      customToast.error("Please add at least 3 skills");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      customToast.loading("Saving skills...");
+      const response = await userApi.updateSkills(skills);
+      customToast.endLoadAndSuccess("Skills updated successfully");
+      onClose();
+    } catch (error) {
+      console.error("Update skills error:", error);
+      customToast.endLoadAndError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancel = (e) => {
+    e.preventDefault();
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 min-h-screen z-50 flex items-center justify-center backdrop-blur-[2px] bg-black/10 px-4">
-    <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-xl">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800">Key skills</h2>
-          <p className="text-sm text-gray-500">
-            Add skills that best define your expertise, for example Direct Marketing,
-            Oracle, Java, etc. (Minimum 3)
-          </p>
-        </div>
-        <button className="text-gray-400 hover:text-gray-600">
-          <X size={20} />
-        </button>
-      </div>
-
-      {/* Selected Skills */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {skills.map((skill, index) => (
-          <span
-            key={index}
-            className="bg-[#9D3BB0] text-white px-3 py-1 rounded-md flex items-center gap-2 text-sm"
-          >
-            {skill}
-            <button onClick={() => removeSkill(skill)}>
-              <X size={14} className="text-white" />
-            </button>
-          </span>
-        ))}
-      </div>
-
-      {/* Input Field */}
-      <input
-        type="text"
-        placeholder="Add skills"
-        className="w-full border border-gray-300 px-3 py-2 rounded-md mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#9D3BB0]"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleInputKeyDown}
-      />
-
-      {/* Suggested Skills */}
-      <p className="text-sm font-medium text-gray-700 mb-2">
-        Or you can select from the suggested set of skills
-      </p>
-      <div className="flex flex-wrap gap-2 mb-6">
-        {defaultSuggestions.map((suggestion, index) => (
-          <button
-            key={index}
-            className="border border-[#9D3BB0] text-[#9D3BB0] px-3 py-1 rounded-md text-sm flex items-center gap-1 hover:bg-[#f9ebfc]"
-            onClick={() => addSkill(suggestion)}
-          >
-            {suggestion}
-            <Plus size={14} />
+      <div className="fade-out bg-white space-y-4 2xl:space-y-10 p-10 rounded-[10px] shadow-md w-full max-w-[600px] 2xl:max-w-[800px] text-[#180323]">
+        <div className="flex justify-between items-start">
+          <div>
+            <Typography variant="h6_700" className="leading-[32px]">Key skills</Typography>
+            <Typography variant="bodyM_400" className="text-[#949494] tracking-[0]">
+              Add skills that best define your expertise, for example Direct Marketing, Oracle, Java, etc. (Minimum 3)
+            </Typography>
+          </div>
+          <button onClick={handleCancel} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
           </button>
-        ))}
-      </div>
+        </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-4">
-        <button className="text-[#9D3BB0] hover:underline">Cancel</button>
-        <button
-          className="bg-[#9D3BB0] text-white px-5 py-2 rounded-md text-sm hover:bg-[#812d94]"
-          disabled={skills.length < 3}
-        >
-          Save
-        </button>
+        <div className="space-y-4">
+          {/* Selected Skills */}
+          <Typography variant="bodyM_700" className="">Skills</Typography>
+          <div className="flex flex-wrap gap-4">
+            {skills.map((skill, index) => (
+              <Typography
+                key={`${index}_${skill}`}
+                variant="bodyXS_700"
+                className="flex items-center gap-2 font-medium bg-[#993D6F] hover:bg-[#993D6FEE] text-white px-4 py-[7px] rounded-sm"
+              >
+                {skill} <button className="cursor-pointer" onClick={() => removeSkill(skill)}><X size={18} /></button>
+              </Typography>
+            ))}
+          </div>
+        </div>
+        {/* Input Field */}
+        <Input
+          type="text"
+          label="Add skills"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleInputKeyDown}
+        />
+
+        {/* Suggested Skills */}
+        <div className="space-y-4">
+          <Typography variant="bodyM_700" className="tracking-0">
+            Or you can select from the suggested set of skills
+          </Typography>
+          <div className="flex flex-wrap gap-4">
+            {defaultSuggestions.map((suggestion, index) => (
+              <Typography
+                onClick={() => addSkill(suggestion)}
+                key={`${index}_${suggestion}`}
+                variant="bodyXS_700"
+                className={`flex items-center gap-2 font-medium text-[#AA1299] border-2 border-[#AA1299] px-[14px] py-[5px] rounded-sm cursor-pointer ${skills.includes(suggestion) ? "bg-[#AA1299] text-white" : "" }`}
+              >
+                {suggestion} {!skills.includes(suggestion) && <Plus size={18} />}
+              </Typography>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-4">
+          <CancelButton handleClose={handleCancel} disabled={isLoading} />
+          <SaveButton handleSave={handleSave} disabled={isLoading || skills.length < 3} />
+        </div>
       </div>
-    </div>
     </div>
   );
 };

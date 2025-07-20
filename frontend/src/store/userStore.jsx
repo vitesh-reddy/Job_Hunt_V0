@@ -3,7 +3,7 @@ import { create } from "zustand";
 // Manages user data
 const useUserStore = create((set) => ({
   user: { _id: "", name: "", identifier: "", identifierType: "" },
-  setUser: (userData) => set({ user: { ...userData } }),
+  setUser: (userData) => set((state) => ({ user: { ...state.user, ...userData }})),
   clearUser: () => set({ user: null }),
 }));
 

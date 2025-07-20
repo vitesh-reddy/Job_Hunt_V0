@@ -69,6 +69,29 @@ const authApi = {
       throw error.response?.data?.error || 'Failed to resend OTP';
     }
   },
+  forgetPassword: async ({ identifier }) => {
+    try {
+      const response = await axiosInstance.post('auth/forget-password', {
+        identifier,
+      });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error.response?.data?.error || 'Failed to send reset link';
+    }
+  },
+  resetPassword: async ({ token, newPassword }) => {
+    try {
+      const response = await axiosInstance.post('auth/reset-password', {
+        token,
+        newPassword,
+      });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error.response?.data?.error || 'Failed to reset password';
+    }
+  }
 };
 
 export default authApi;

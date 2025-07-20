@@ -85,8 +85,8 @@ const VerifyOtp = () => {
     <AuthLayout>
       <main className="flex w-full flex-col justify-between p-8">
         <div>
-          <AuthHeader title="Please enter your OTP" />
-          <form className="flex items-center justify-between gap-2 xl:pr-7 mb-8" onSubmit={(e) => e.preventDefault()}>
+          <AuthHeader title="Verification" information="Please enter your OTP" />
+          <form className="flex items-center justify-between gap-2 mb-8" onSubmit={(e) => e.preventDefault()}>
             {otp.map((digit, index) => (
           <input
             key={index}
@@ -95,7 +95,7 @@ const VerifyOtp = () => {
             ref={(el) => (inputsRef.current[index] = el)}
             onChange={(e) => handleChange(index, e.target.value)}
             onPaste={index === 0 ? handlePaste : undefined}
-            className="h-12 xl:h-[63px] w-12 xl:w-[58px] rounded-[10px] bg-[#F4F4F4] pt-3 xl:pt-5 text-center text-3xl xl:text-[40px] text-[#262626] focus:ring-2 focus:ring-[#A10091]"
+            className="h-12 xl:h-[55px] w-12 xl:w-[48px] 2xl:xl:h-[63px] 2xl:w-[58px] rounded-[10px] bg-[#F4F4F4] pt-5 text-center text-3xl xl:text-[40px] text-[#262626] focus:ring-2 focus:ring-[#A10091]"
             maxLength={1}
             inputMode="numeric"
             type="text"
@@ -106,14 +106,14 @@ const VerifyOtp = () => {
         </div>
         <div className="space-y-4 pt-6">
           <button disabled={isVerifying || isResending} type="submit" onClick={() => submit()}
-            className="w-full group hover:bg-[#1B1C1C] hover:text-white lg:px-[16px] lg:py-[8px] 2xl:px-[24px] 2xl:py-[14px] border-2 border-[#1B1C1C] rounded-[4px] transiton-colors duration-300 ease-out" >
+            className="w-full group bg-[#1B1C1C] hover:bg-white hover:text-[#1B1C1C] active:bg-[#1B1C1C] active:text-white text-white px-[16px] py-[8px] 2xl:px-[24px] 2xl:py-[14px] border-2 border-[#1B1C1C] rounded-[4px] transiton-all duration-300 ease-out" >
             <Typography variant="bodyL_500" align="center"> Submit </Typography>
           </button>            
           <p className="text-center text-[12px] sm:text-[14px] xl:text-[16px] text-[#262626] leading-[20px]">
             Didn’t receive the OTP?{' '}
             <button
               type="button"
-              className="text-[#262626] font-extrabold underline"
+              className="text-[#262626] font-extrabold underline cursor-pointer"
               onClick={resend}
             >
               Resend OTP

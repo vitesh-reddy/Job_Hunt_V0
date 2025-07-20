@@ -35,13 +35,13 @@ const Login = () => {
 
   return (
     <AuthLayout>
-      <main className="flex w-full flex-col justify-center p-6 sm:p-8">
+      <main className="flex w-full flex-col justify-center sm:p-8">
         <div>
           <AuthHeader title="Welcome Back!" information="Log in to your account" />
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-[16px] 2xl:space-y-[24px]">
             <Input
-              // {...formAnimations}            
+              // {...formAnimations}
               label="Email / Mobile Number"
               {...register('identifier', {
                 required: 'Required',
@@ -54,7 +54,7 @@ const Login = () => {
             />
 
             <Input
-              // {...formAnimations}            
+              // {...formAnimations} 
               label="Password"
               type="password"
               {...register('password', {
@@ -72,14 +72,14 @@ const Login = () => {
                 <input type="checkbox" className="accent-[#A10091]" {...register('remember')} />
                 <span className="text-[#262626]">Remember Me</span>
               </label>
-              <Link to="#" className="text-sm 2xl:font-medium text-[#262626] underline">
+              <Link to="/forget-password" className="text-sm 2xl:font-medium text-[#262626] underline cursor-pointer">
                 Forgot Password?
               </Link>
             </div>
 
             <button disabled={isLoading} type="submit"
-              className="w-full group hover:bg-[#1B1C1C] hover:text-white lg:px-[16px] lg:py-[8px] 2xl:px-[24px] 2xl:py-[14px] border-2 border-[#1B1C1C] rounded-[4px] transiton-colors duration-300 ease-out" >
-              <Typography variant="bodyL_500" align="center"> Login </Typography>
+              className="w-full group bg-[#1B1C1C] hover:bg-white hover:text-[#1B1C1C] active:bg-[#1B1C1C] active:text-white text-white px-[16px] py-[8px] 2xl:px-[24px] 2xl:py-[14px] border-2 border-[#1B1C1C] rounded-[4px] transiton-all duration-300 ease-out" >
+              <Typography variant="bodyL_700" align="center" className="text-[14px] md:text-[18px] font-medium"> Login </Typography>
             </button>          
           </form>
         </div>
@@ -90,7 +90,7 @@ const Login = () => {
             <button
               type="button"
               onClick={() => navigate('/signup/?mode=email')}
-              className="text-[#262626] font-extrabold underline"
+              className="text-[#262626] font-extrabold underline cursor-pointer"
             >
               Register
             </button>
@@ -99,7 +99,7 @@ const Login = () => {
       </main>
     </AuthLayout>
   );
-};
+};  
 
 export default Login;
 

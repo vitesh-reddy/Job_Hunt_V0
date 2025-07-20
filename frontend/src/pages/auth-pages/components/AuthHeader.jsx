@@ -16,15 +16,14 @@ const AuthHeader = ({ title, information }) => {
   }
 
   return (
-    // <div className="mb-4 2xl:mb-8 flex flex-col gap-3 2xl:gap-10">
     <div className="mb-4 2xl:mb-8 flex flex-col gap-[8px]">
       <div>
         <button
           onClick={handleBack}
-          className="mb-1 xl:mb-4 2xl:mb-6 flex items-center group  hover:bg-[#1B1C1C] hover:text-white lg:px-[16px] lg:py-[8px] 2xl:px-[24px] 2xl:py-[14px] border-2 border-[#1B1C1C] rounded-full transiton-colors duration-300 ease-out"
+          className="mb-1 xl:mb-4 2xl:mb-6 flex items-center group hover:bg-[#1B1C1C] hover:text-white active:bg-white active:text-[#1B1C1C] pl-[10px] pr-[16px] py-[6px] 2xl:px-[24px] 2xl:py-[14px] border-2 border-[#1B1C1C] rounded-full transiton-colors duration-300 ease-out"
         >
           {/* Back Arrow */}
-          <svg className="inline scale-70 2xl:scale-100 text-[#1B1C1C] group-hover:text-white transiton-colors duration-300 ease-out" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+          <svg className="inline scale-70 2xl:scale-100 text-[#1B1C1C] group-hover:text-white group-active:text-[#1B1C1C] transiton-colors duration-300 ease-out" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
             <path d="M5.5 12.5H19.5M5.5 12.5L11.5 18.5M5.5 12.5L11.5 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           <Typography variant="bodyL_500" >

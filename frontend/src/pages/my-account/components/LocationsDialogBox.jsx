@@ -1,76 +1,123 @@
-import React, { useState } from "react";
-import { X, Plus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { Typography } from "@components/Typography";
+import CancelButton from "./CancelButton";
+import SaveButton from "./SaveButton";
+import useUserStore from "@store/userStore";
+import userApi from "@services/userApi";
+import { customToast } from "@utils/toast";
+import AutocompleteInput from "@components/AutocompleteInput";
+import indianCities from "@constants/indianCities.js";
 
-const LocationsDialogBox = () => {
+const LocationsDialogBox = ({ onClose }) => {
+  const { user } = useUserStore();
   const [locations, setLocations] = useState([]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load existing job locations
+  useEffect(() => {
+    if (user?.jobLocations)
+      setLocations(user.jobLocations);
+  }, [user]);
 
   const addLocation = (location) => {
-    if (location && !locations.includes(location)) {
+    if (location && !locations.includes(location))
       setLocations([...locations, location]);
-    }
     setInput("");
   };
 
   const removeLocation = (location) => {
-    setLocations(locations.filter((s) => s !== location));
+    setLocations(locations.filter((l) => l !== location));
   };
 
-  const handleInputKeyDown = (e) => { 
+  const handleEnterKeyAddLocation = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      addLocation(input.trim());
+      const matched = indianCities.find(
+        (city) => city.toLowerCase() === input.trim().toLowerCase()
+      );
+      if (matched)
+        addLocation(matched);
     }
+  };
+
+  const handleSelectFromAutocomplete = (value) => {
+    if (value)
+      addLocation(value);
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (locations.length < 1) {
+      customToast.error("Please add at least one job location");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      customToast.loading("Saving job locations...");
+      await userApi.updateJobLocations(locations);
+      customToast.endLoadAndSuccess("Job locations updated successfully");
+      onClose();
+    } catch (error) {
+      console.error("Update job locations error:", error);
+      customToast.endLoadAndError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClose = (e) => {
+    e.preventDefault();
+    onClose();
   };
 
   return (
     <div className="fixed inset-0 min-h-screen z-50 flex items-center justify-center backdrop-blur-[2px] bg-black/10 px-4">
-    <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-xl">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800">Job Locations</h2>
+      <div className="fade-in fade-out bg-white space-y-4 2xl:space-y-10 p-10 rounded-[10px] shadow-md w-full max-w-[600px] 2xl:max-w-[800px] text-[#180323]">
+        <div className="flex justify-between items-start">
+          <Typography variant="h6_700" className="leading-[32px]">
+            Job Location
+          </Typography>
+          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
+          </button>
         </div>
-        <button className="text-gray-400 hover:text-gray-600">
-          <X size={20} />
-        </button>
-      </div>
 
-      {/* Input Field */}
-      <input
-        type="text"
-        placeholder="Add locations"
-        className="w-full border border-gray-300 px-3 py-2 rounded-md mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#9D3BB0]"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleInputKeyDown}
-      />
-    
-      {/* Selected Locations */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {locations.map((location, index) => (
-          <span
-            key={index}
-            className="bg-[#9D3BB0] text-white px-3 py-1 rounded-md flex items-center gap-2 text-sm"
-          >
-            {location}
-            <button onClick={() => removeLocation(location)}>
-              <X size={14} className="text-white" />
-            </button>
-          </span>
-        ))}
-      </div>
+        {/* Autocomplete Input */}
+        <AutocompleteInput
+          label="Search location"
+          options={indianCities}
+          value={input}
+          onChange={(val) => setInput(val)}
+          onSelectValue={handleSelectFromAutocomplete}
+          onKeyDown={handleEnterKeyAddLocation}
+        />
 
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-4">
-        <button className="text-[#9D3BB0] hover:underline">Cancel</button>
-        <button
-          className="bg-[#9D3BB0] text-white px-5 py-2 rounded-md text-sm hover:bg-[#812d94]"
-          disabled={locations.length < 3}
-        >
-          Save
-        </button>
+        {/* Selected Locations */}
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-4">
+            {locations.map((location, index) => (
+              <Typography
+                key={`${index}_${location}`}
+                variant="bodyXS_700"
+                className="flex items-center gap-2 font-medium bg-[#993D6F] hover:bg-[#993D6FEE] text-white px-4 py-[7px] rounded-sm"
+              >
+                {location}
+                <button className="cursor-pointer" onClick={() => removeLocation(location)}>
+                  <X size={18} />
+                </button>
+              </Typography>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-4">
+          <CancelButton handleClose={handleClose} disabled={isLoading} />
+          <SaveButton handleSave={handleSave} disabled={isLoading || locations.length < 1} />
+        </div>
       </div>
-    </div>
     </div>
   );
 };

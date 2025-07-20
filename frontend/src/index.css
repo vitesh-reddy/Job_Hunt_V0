@@ -12,3 +12,77 @@
     box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.30),
                 0px 1px 3px 1px rgba(0, 0, 0, 0.10);
   }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease both;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.3s ease-out both;
+}
+@import "tailwindcss";
+
+
+
+.custom-pink{
+  background-color: #B75589;
+}
+.custom-pink:hover{
+  background-color: #7C2457;
+}   
+.text-customcolor{
+  color: #AA1299;
+}
+.custom-pink2{
+  background-color: #47464C;
+}
+.custom-pink3{
+  background-color: #F7F2FA
+}
+.custom-bordercolor1 {
+  border: 2px solid #AA1299; /* Adds a border and sets its color */
+}
+.custom-bordercolor2 {
+  border-bottom: 1px solid #AA1299; /* Adds a border and sets its color */
+}
+.custom-bordercolor3 {
+  border-top: 1px solid #AA1299; /* Adds a border and sets its color */
+}
+
+
+
+
+
+
+@theme {
+  --font-sans: "DM Sans", sans-serif;  
+  --font-manrope: "Manrope", sans-serif;
+}
+
+.shadow-section {
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.30),
+                0px 1px 3px 1px rgba(0, 0, 0, 0.10);
+  }
+
